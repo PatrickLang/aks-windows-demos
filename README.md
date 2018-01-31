@@ -102,3 +102,14 @@ aks-nodepool1-27183287-0   Ready     agent     28m       v1.7.7
 virtual-kubelet-vk1-win    Ready     agent     1m        v1.8.3
 ```
 
+
+
+### Deploy the Windows app 
+
+> Note: Stuff from this point isn't working yet
+
+
+`kubectl apply -f whoami.json`
+
+
+> Note: For apps to run under ACI, they need to have the right tolerations to allow scheduling on aci, and node selectors to pick the windows node. See whoami.json for an example.

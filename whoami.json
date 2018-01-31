@@ -15,7 +15,7 @@
                                         "containers": [
                                         {
                                                 "name": "iis",
-                                                "image": "stefanscherer/whoami:windows-amd64-1.5.3-1709",
+                                                "image": "stefanscherer/whoami:windows-amd64-1.5.3",
                                                 "ports": [
                                                 {
                                                         "containerPort": 80
