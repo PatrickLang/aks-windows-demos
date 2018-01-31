@@ -7,6 +7,9 @@ This is my attempt to capture steps needed to deploy:
 
 
 ```bash
+# Change these to be unique
+export RGNAME=plang-aks1rg
+export AKSNAME=plagn-aks1
 
 
 ```
