@@ -1,0 +1,39 @@
+{
+        "apiVersion": "apps/v1beta1",
+                "kind": "Deployment",
+                "metadata": {
+                        "name": "whoami-deployment"
+                },
+                "spec": {
+                        "replicas": 1,
+                        "template": {
+                                "metadata":{
+                                        "labels": {
+                                                "name": "whoami"
+                                        }},
+                                "spec": {
+                                        "containers": [
+                                        {
+                                                "name": "iis",
+                                                "image": "stefanscherer/whoami:windows-amd64-1.5.3-1709",
+                                                "ports": [
+                                                {
+                                                        "containerPort": 80
+                                                }
+                                                ]
+                                        }
+                                        ],
+                                        "nodeSelector": {
+                                                "beta.kubernetes.io/os": "windows"
+                                        },
+                                        "tolerations": [ 
+                                        { 
+                                                "key": "azure.com/aci",
+                                                "operator": "Equal",
+                                                "effect": "NoSchedule"
+                                        }
+                                        ]
+                                }
+                        }
+                }
+}

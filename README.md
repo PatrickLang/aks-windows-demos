@@ -6,7 +6,13 @@ This is my attempt to capture steps needed to deploy:
 4. Helm to deploy a Windows app with web app in container, backend in Azure SQL
 
 
-Prerequisites
+## Prerequisites
+
+I do all my management with Ubuntu under the [Windows Subsystem for Linux](https://docs.microsoft.com/en-us/windows/wsl/about). Once that's set up, you need to install:
+
+- [Azure CLI 2.0](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest)
+- [Helm](https://github.com/kubernetes/helm/blob/master/docs/install.md)
+
 
 ```bash
 # login
@@ -18,7 +24,9 @@ az provider register -n Microsoft.ContainerService
 ```
 
 
-Now deploy the AKS cluster
+## Deploy the AKS cluster
+
+This is mostly lifted from Azure's [Kubernetes Walkthrough](https://docs.microsoft.com/en-us/azure/aks/kubernetes-walkthrough)
 
 ```bash
 # Change these to be unique
@@ -37,3 +45,60 @@ az aks get-credentials --resource-group $RGNAME --name $AKSNAME
 ```
 
 If you've been playing with Kubernetes on Azure, you'll probably have multiple configs on your machine. To keep track of them, use `kubectl config get-contexts`. The last one you downloaded with `az aks get-credentials` is selected, but you can always switch back to the others with `kubectl config use-context`
+
+
+## Deploy a Linux app
+
+`kubectl apply -f azure-vote.yml`
+
+Now - wait on the public service IP with
+
+`kubectl get svc -w` 
+
+and watch for azure-vote-front to have an IP. Then connect to it from a browser
+
+Once you're done, delete it with 
+
+```bash
+kubectl delete deploy azure-vote-front
+kubectl delete deploy azure-vote-back
+kubectl delete svc azure-vote-front
+kubectl delete svc azure-vote-back
+```
+
+
+### Optional - Upgrade it
+
+You can upgrade to a new version easily with two commands. Find the version you want with `az aks get-versions`, then upgrade with `az aks upgrade --kubernetes-version <version> --resource-group <rgname> --name <aks name>` using the name and resource group name from above.
+
+## Deploy the Virtual Kubelet
+
+First, make sure Helm is initialized. Run `kubectl get pods --namespace kube-system` - if you don't see **tiller** listed, then run `helm init` before moving on.
+
+
+This assumes you still have RGNAME and AKSNAME set from earlier.
+
+```bash
+az aks install-connector --resource-group $RGNAME --name=$AKSNAME --os-type Windows --connector-name vk1
+```
+
+That will drop a helpful hint to check that it's running. It will be something like this
+
+```
+NOTES:
+The virtual kubelet is getting deployed on your cluster.
+
+To verify that virtual kubelet has started, run:
+
+  kubectl --namespace=default get pods -l "app=vk1-windows-virtual-kubelet"
+```
+
+Once that pod is up, `kubectl get node` will show the virtual Windows node running:
+
+```
+$ kubectl get node
+NAME                       STATUS    ROLES     AGE       VERSION
+aks-nodepool1-27183287-0   Ready     agent     28m       v1.7.7
+virtual-kubelet-vk1-win    Ready     agent     1m        v1.8.3
+```
+
