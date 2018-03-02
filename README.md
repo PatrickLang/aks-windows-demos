@@ -76,6 +76,9 @@ You can upgrade to a new version easily with two commands. Find the version you 
 First, make sure Helm is initialized. Run `kubectl get pods --namespace kube-system` - if you don't see **tiller** listed, then run `helm init` before moving on.
 
 
+> To find a good region, see Azure Container Instances [Region Availability](https://docs.microsoft.com/en-us/azure/container-instances/container-instances-quotas) for Windows.  As of 3/2, Windows is in WestEurope, WestUS, EastUS, SoutheastAsia
+
+
 This assumes you still have RGNAME and AKSNAME set from earlier.
 
 ```bash
@@ -103,6 +106,19 @@ virtual-kubelet-vk1-win    Ready     agent     1m        v1.8.3
 ```
 
 
+### temporary workaround - missing SP
+
+> example log & github issue link needed
+
+```
+kubectl log <podname>
+
+
+# Get service principal GUID
+cat .azure/aksServicePrincipal.json
+az role assignment create --assignee "..." --resource-group plang-aks1 --role Contributor
+```
+
 
 ### Deploy the Windows app 
 
@@ -113,3 +129,13 @@ virtual-kubelet-vk1-win    Ready     agent     1m        v1.8.3
 
 
 > Note: For apps to run under ACI, they need to have the right tolerations to allow scheduling on aci, and node selectors to pick the windows node. See whoami.json for an example.
+
+
+
+## Deploy a Windows app with Helm
+
+
+```
+helm create iis-static
+```
+
