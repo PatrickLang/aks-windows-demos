@@ -132,6 +132,23 @@ az role assignment create --assignee "..." --resource-group plang-aks1 --role Co
 
 
 
+After some time, `kubectl get pod` should show the pod as _Running_. If it doesn't, check the logs from the virtual kubelet.
+
+```bash
+# Get pod name - same as checking the status after running az aks install-connector
+kubectl --namespace=default get pods -l "app=vk1-windows-virtual-kubelet-for-aks"
+
+# Check logs
+kubectl logs vk1-windows-virtual-kubelet-for-aks-1491062091-7qdb7
+```
+
+You should get a helpful hint like this:
+
+```
+2018/03/02 23:34:09 Error creating pod 'boisterous-greyhound-iis-static-84fb585686-brj7x': api call to https://management.azure.com/subscriptions/<redacted subid>/resourceGroups/plang-aks1rg/providers/Microsoft.ContainerInstance/containerGroups/default-boisterous-greyhound-iis-static-84fb585686-brj7x?api-version=2017-12-01-preview: got HTTP response status code 400 error code "ResourceSomeRequestsNotSpecified": The 'MemoryInGB' request is not specified in 'Microsoft.Azure.CloudConsole.Providers.Common.Entities.ComputeResources' in container 'iis-static' of contain group 'default-boisterous-greyhound-iis-static-84fb585686-brj7x'. It is required since API version '2017-07-01-preview'.
+```
+
+
 ## Deploy a Windows app with Helm
 
 
@@ -139,3 +156,47 @@ az role assignment create --assignee "..." --resource-group plang-aks1 --role Co
 helm create iis-static
 ```
 
+
+
+### Mistakes I made
+
+At first, I didn't set a container memory limit. I found this error from the virtual kubelet:
+
+```
+2018/03/02 23:34:09 Error creating pod 'boisterous-greyhound-iis-static-84fb585686-brj7x': api call to https://management.azure.com/subscriptions/<redacted subid>/resourceGroups/plang-aks1rg/providers/Microsoft.ContainerInstance/containerGroups/default-boisterous-greyhound-iis-static-84fb585686-brj7x?api-version=2017-12-01-preview: got HTTP response status code 400 error code "ResourceSomeRequestsNotSpecified": The 'MemoryInGB' request is not specified in 'Microsoft.Azure.CloudConsole.Providers.Common.Entities.ComputeResources' in container 'iis-static' of contain group 'default-boisterous-greyhound-iis-static-84fb585686-brj7x'. It is required since API version '2017-07-01-preview'.
+```
+
+My fix was to add this to iis-static/values.yaml:
+
+```
+resources:
+  limits:
+    memory: 1G 
+```
+
+
+Which led to the similar errors:
+
+```
+The 'Cpu' request is not specified in 'Microsoft.Azure.CloudConsole.Pro
+viders.Common.Entities.ComputeResources' in container 'iis-static' of contain group 'default-boisterous-greyhound-iis-static-6c65cc687-hxswb'. It is required since API
+version '2017-07-01-preview'.
+
+...
+
+The 'Cpu' request is not specified in 'Microsoft.Azure.CloudConsole.Pro
+viders.Common.Entities.ComputeResources' in container 'iis-static' of contain group 'default-boisterous-greyhound-iis-static-6c65cc687-snhwd'. It is required since API
+version '2017-07-01-preview'.
+```
+
+So now values.yaml:
+
+```
+resources:
+  limits:
+    memory: 1G 
+    cpu: 1
+  requests:
+    cpu: 1
+ 
+```
