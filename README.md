@@ -175,6 +175,10 @@ boisterous-greyhound-iis-static-76c9c8bcc4-4bj9n       1/1       Running   0    
 vk1-windows-virtual-kubelet-for-aks-1491062091-7qdb7   1/1       Running   0          24m
 ```
 
+Azure Container Instances allocates public IPs by default, so you can access the service at its IP listed in `kubectl get pod -o wide`
+
+
+
 
 ### Mistakes I made
 
