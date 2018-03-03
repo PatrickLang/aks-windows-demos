@@ -157,6 +157,24 @@ helm create iis-static
 ```
 
 
+Check the status with `helm list`
+
+After you modify your chart or values, then `helm upgrade <name> <chart directory>`
+
+
+Here's what it looks like once the Helm chart is installed and pod is running:
+
+```
+patrick@plang-h1:~/6385b8a593a3519f81bb096c9edda6b2$ helm list
+NAME                    REVISION        UPDATED                         STATUS          CHART                           NAMESPACE
+boisterous-greyhound    5               Fri Mar  2 15:51:52 2018        DEPLOYED        iis-static-0.1.0                default
+vk1-windows             1               Fri Mar  2 15:10:55 2018        DEPLOYED        virtual-kubelet-for-aks-0.1.3   default
+patrick@plang-h1:~/6385b8a593a3519f81bb096c9edda6b2$ kubectl get pod
+NAME                                                   READY     STATUS    RESTARTS   AGE
+boisterous-greyhound-iis-static-76c9c8bcc4-4bj9n       1/1       Running   0          8m
+vk1-windows-virtual-kubelet-for-aks-1491062091-7qdb7   1/1       Running   0          24m
+```
+
 
 ### Mistakes I made
 
@@ -200,3 +218,5 @@ resources:
     cpu: 1
  
 ```
+
+
