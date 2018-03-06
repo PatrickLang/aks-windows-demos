@@ -182,6 +182,9 @@ Azure Container Instances allocates public IPs by default, so you can access the
 
 ### Mistakes I made
 
+
+#### Forgot to set container cpu & memory resources needed for Virtual Kubelet
+
 At first, I didn't set a container memory limit. I found this error from the virtual kubelet:
 
 ```
@@ -222,5 +225,28 @@ resources:
     cpu: 1
  
 ```
+
+#### No Load Balancer support
+
+https://github.com/virtual-kubelet/virtual-kubelet#missing-load-balancer-ip-addresses-for-services
+
+Initially, I had:
+
+```
+service:
+  type: LoadBalancer
+  port: 80
+```
+
+Which I needed to change to `ClusterIP`
+
+```
+service:
+  type: ClusterIP
+  port: 80
+```
+
+After that, the public IP will be shown in `kubectl get pod`, and there's a cluster IP in `kubectl get svc`, but the cluster IP doesn't seem to be accessible.
+
 
 
