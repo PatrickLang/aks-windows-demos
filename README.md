@@ -249,4 +249,21 @@ service:
 After that, the public IP will be shown in `kubectl get pod`, and there's a cluster IP in `kubectl get svc`, but the cluster IP doesn't seem to be accessible.
 
 
+## TODO
 
+Questions:
+
+- Where to next for Windows templates?
+  - github?
+  - modify helm create? - feedback from matt fisher - look into [starter charts](https://github.com/kubernetes/helm/blob/89b8312c489a02e0af5f354bcc4671c7b67f85ed/docs/charts.md#chart-starter-packs)
+
+- Demystifying the IPs?
+ ping Eddie Villalba re: similar demo
+```yaml
+metadata:
+  annotations: 
+    virtualkubelet.io/dnsnamelabel: "value"
+```
+will create dnsnamelabel.region.azurecontainer.io
+create traffic manager, register containers there by dns name
+in k8s, create a service, type: externalName, externalName: url.trafficmanager.net
